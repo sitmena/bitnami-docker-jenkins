@@ -41,9 +41,6 @@ ENV BITNAMI_APP_NAME="jenkins" \
     OS_NAME="linux"
 
 # Install docker
-
-#ADD get-docker.sh /root/get-docker.sh
-#RUN curl -fsSL https://get.docker.com -o get-docker.sh && \
 RUN apt update && apt install -y \
     apt-transport-https \
     lsb-release \ 
@@ -62,6 +59,8 @@ RUN apt update && \
     apt install python3.7 -y && \
     apt install python3-distutils -y
 
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Make python 3.7 the default
 RUN echo "alias python=python3.7" >> ~/.bashrc && \
@@ -74,7 +73,7 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
 RUN python3 -m pip install --upgrade pip
 
 # Install kubectl
-RUN  curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.7.0/bin/linux/amd64/kubectl
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.7.0/bin/linux/amd64/kubectl
 RUN chmod +x ./kubectl 
 RUN mv ./kubectl /usr/local/bin/kubectl
 
@@ -85,8 +84,6 @@ RUN curl -fsSL https://get.pulumi.com | sh
 COPY ./jenkins_keys/ /root/.ssh/
 
 EXPOSE 8080 8443 50000
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 USER 1001
 ENTRYPOINT [ "/app-entrypoint.sh" ]
